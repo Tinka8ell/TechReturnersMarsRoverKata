@@ -37,3 +37,17 @@ Drawing the [Initial UML](doc/Mars1UML.jpg) enabled me to identify some more uti
 * IntVector2D - x & y container
 
 On top of this, we will have a main method class to act as the console device.
+To keep things clean we will put everything in its own package: com.tinkabell.rover
+
+## Testing Strategy
+
+Of course, we will be using TDD, but what do we need to support this?  As much of the class data is private,
+and we don't want to break encapsulation, I will add protected inspectors, so we can see (but not touch) 
+internal state to check void returning methods have changes state.  
+There is no point in calling them if they do nothing!
+
+In addition to this, many of the methods take integer and character inputs as space separated Strings.  
+This will mean that there will be input format validation, so we will have to check for correct 
+Invalid Input Exceptions (whatever they will be, but probably runtime exceptions) being thrown.
+
+As the classes and supporting test classes evolve, they will be documented in the Git commit history. 
