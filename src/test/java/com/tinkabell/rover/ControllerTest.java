@@ -19,12 +19,6 @@ class ControllerTest {
     @Test
     void checkCreatePlateau() {
         assertEquals("Controller{mars: null}", controller.inspector());
-        controller.createPlateau(13, 11);
-        assertEquals("Controller{mars: Plateau{width: 13, height: 11}}", controller.inspector());
-    }
-
-    @Test
-    void checkCreatePlateauString() {
         controller.createPlateau("  11   9   ");
         assertEquals("Controller{mars: Plateau{width: 11, height: 9}}", controller.inspector());
     }
@@ -50,13 +44,11 @@ class ControllerTest {
         assertThrows(NumberFormatException.class, () -> controller.createPlateau("  1  "), "with too few arguments");
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "0, 100",
-            "100, -3"
-    })
-    void checkCreatePlateauError(int width, int height) {
-        assertThrows(NumberFormatException.class, () -> controller.createPlateau(width, height));
+    @Test
+    public void checkGetRover(){
+        controller.createPlateau("11 9");
+        Rover rover = controller.getRover("1 2 N");
+        assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{1 2 N}}}", controller.inspector());
     }
 
 }

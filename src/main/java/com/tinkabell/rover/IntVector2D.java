@@ -15,4 +15,9 @@ public class IntVector2D {
         this.x = x;
         this.y = y;
     }
+
+    public String inspector() {
+        return String.format("%d %d", x, y);
+    }
+
 }

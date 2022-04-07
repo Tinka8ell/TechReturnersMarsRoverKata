@@ -10,16 +10,6 @@ public class Controller {
     private Plateau mars;
 
     /**
-     * Create the Plateau object.
-     *
-     * @param width Integer of the underlying Plateau
-     * @param height Integer of the underlying Plateau
-     */
-    public void createPlateau(int width, int height){
-        mars = new Plateau(width, height);
-    }
-
-    /**
      * Create the Plateau object from String input
      *
      * @param line String containing width and height separated with a space
@@ -38,4 +28,9 @@ public class Controller {
         return "Controller{mars: " + (mars == null ? "null": mars.inspector()) + "}";
     }
 
+    public Rover getRover(String line){
+        if (mars == null)
+            throw new NullPointerException("Can't get Rover until we have a Plateau!");
+        return mars.getRover(line);
+    }
 }
