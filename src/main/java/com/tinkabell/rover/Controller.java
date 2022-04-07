@@ -11,14 +11,21 @@ public class Controller {
 
     /**
      * Create the Plateau object.
-     * Currently exposes the Plateau, but may not be valid.
      *
      * @param width Integer of the underlying Plateau
      * @param height Integer of the underlying Plateau
-     * @return the embedded Plateau object
      */
-    public Plateau createPlateau(int width, int height){
-        return mars = new Plateau(width, height);
+    public void createPlateau(int width, int height){
+        mars = new Plateau(width, height);
+    }
+
+    /**
+     * Create the Plateau object from String input
+     *
+     * @param line String containing width and height separated with a space
+     */
+    public void createPlateau(String line){
+        mars = new Plateau(line);
     }
 
     /**
