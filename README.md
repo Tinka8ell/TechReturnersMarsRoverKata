@@ -51,3 +51,13 @@ This will mean that there will be input format validation, so we will have to ch
 Invalid Input Exceptions (whatever they will be, but probably runtime exceptions) being thrown.
 
 As the classes and supporting test classes evolve, they will be documented in the Git commit history. 
+
+## First Design Adjustment
+
+As I worked through the testing of the basic framework, I realised that some things that were built and tested
+now needed to become private.  The create methods for Controller and Plateau should really be String only, 
+unless we later expose a more native API.  Also realised that to at least test Rover creation, I will need 
+to have an exposed getter for a Rover.  As above, I think the command method should take a Rover "String", 
+rather than the Rover object, and that object will be created and used withing the method.  This required changes 
+to the UML, so I now have a [2nd Edition UML](doc/Mars2UML.jpg) to show progress.
+
