@@ -95,11 +95,22 @@ public class Plateau {
         Location key =  new Location(x, y);
         Rover rover = rovers.getOrDefault(key, null);
         if (rover == null){
-            rover = new Rover(direction);
+            rover = new Rover(this, direction);
             rovers.put(key, rover);
         }
         if (rover.getDirection() != direction)
             throw new NumberFormatException("Can't have two different Rovers at the same location");
         return rover;
+    }
+
+    public Location find(Rover rover) {
+        Location location = null;
+        for (Location key : rovers.keySet()) {
+            if (rovers.get(key).equals(rover)){
+                location = key;
+                break;
+            }
+        }
+        return location;
     }
 }

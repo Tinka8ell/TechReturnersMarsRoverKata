@@ -61,3 +61,13 @@ to have an exposed getter for a Rover.  As above, I think the command method sho
 rather than the Rover object, and that object will be created and used withing the method.  This required changes 
 to the UML, so I now have a [2nd Edition UML](doc/Mars2UML.jpg) to show progress.
 
+## Second Design Adjustment
+
+As I formulated the testing of the Rover commands, I realised that there were methods missing in the Rover.
+It also transpired that, although a Rover is created using a Direction, this is an enum and so immutable, 
+so could not change direction.  These meant that a Delta rather than a Direction needed to be the main field.
+Similarly, a Rover needed to know which Plateau it was on, so it could move.  
+Finally, the Controller does not need to know what commands a Rover supports, so the string commands 
+need to be passed through.  We will probably hide (make private) the individual movement commands in the Rover,
+but the UML does not yet reflect this as we will add tests for the internal function during development and remove
+their complexity once working.

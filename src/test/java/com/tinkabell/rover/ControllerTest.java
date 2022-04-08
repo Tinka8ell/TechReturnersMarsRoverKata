@@ -47,8 +47,18 @@ class ControllerTest {
     @Test
     public void checkGetRover(){
         controller.createPlateau("11 9");
-        Rover rover = controller.getRover("1 2 N");
+        controller.getRover("1 2 N");
         assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{1 2 N}}}", controller.inspector());
+    }
+
+    @Test
+    public void checkSendRoverOnlyCommands(){
+        controller.createPlateau("11 9");
+        controller.getRover("1 2 N");
+        controller.command("L");
+        assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{1 2 W}}}", controller.inspector());
+        controller.command("RR");
+        assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{1 2 E}}}", controller.inspector());
     }
 
 }

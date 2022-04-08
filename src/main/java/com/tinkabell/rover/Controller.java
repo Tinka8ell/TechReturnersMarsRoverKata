@@ -7,7 +7,8 @@ package com.tinkabell.rover;
  */
 public class Controller {
 
-    private Plateau mars;
+    private Plateau mars = null;
+    private Rover currentRover = null;
 
     /**
      * Create the Plateau object from String input
@@ -28,9 +29,15 @@ public class Controller {
         return "Controller{mars: " + (mars == null ? "null": mars.inspector()) + "}";
     }
 
-    public Rover getRover(String line){
+    public void getRover(String line){
         if (mars == null)
             throw new NullPointerException("Can't get Rover until we have a Plateau!");
-        return mars.getRover(line);
+        currentRover = mars.getRover(line);
+    }
+
+    public void command(String commandString) {
+        if (currentRover == null)
+            throw new NumberFormatException("Must select a Rover before sending commands");
+        currentRover.command(commandString);
     }
 }
