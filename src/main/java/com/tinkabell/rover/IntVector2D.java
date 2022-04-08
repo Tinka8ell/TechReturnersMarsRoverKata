@@ -1,5 +1,7 @@
 package com.tinkabell.rover;
 
+import java.util.Objects;
+
 /**
  * Integer 2D Vector.
  * This class holds integer values in two directions.
@@ -16,8 +18,29 @@ public class IntVector2D {
         this.y = y;
     }
 
+    public IntVector2D(IntVector2D vector) {
+        this(vector.x, vector.y);
+    }
+
     public String inspector() {
         return String.format("%d %d", x, y);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + " " + y + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof IntVector2D that)) return false;
+        return x == that.x && y == that.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
     public void turn(int sign) {

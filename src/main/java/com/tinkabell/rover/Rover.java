@@ -33,7 +33,7 @@ public class Rover {
 
     @Override
     public String toString() {
-        return world.find(this).toString() + " " + facing.toString();
+        return world.find(this).toString() + " " + getDirection().toString();
     }
 
     /**

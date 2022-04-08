@@ -98,7 +98,7 @@ public class Plateau {
             rover = new Rover(this, direction);
             rovers.put(key, rover);
         }
-        if (rover.getDirection() != direction)
+        if (! rover.getDirection().equals(direction))
             throw new NumberFormatException("Can't have two different Rovers at the same location");
         return rover;
     }

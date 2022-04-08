@@ -10,4 +10,16 @@ public class Delta extends IntVector2D {
     public Delta(int x, int y) {
         super(Integer.signum(x), Integer.signum(y));
     }
+
+    public Delta(Delta delta) {
+        super(delta);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Delta)) return false;
+        return super.equals(o);
+    }
+
 }

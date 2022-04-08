@@ -13,6 +13,6 @@ public enum Direction {
     }
 
     public Delta getDelta() {
-        return delta;
+        return new Delta(delta);
     }
 }
