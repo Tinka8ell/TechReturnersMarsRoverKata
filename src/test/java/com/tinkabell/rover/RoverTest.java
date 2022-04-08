@@ -81,4 +81,16 @@ class RoverTest {
         assertEquals(expected, e.toString());
     }
 
+    @Test
+    public void checkMove(){
+        n.command("M");
+        assertEquals("1 3 " + Direction.N, n.toString());
+        s.command("M");
+        assertEquals("2 0 " + Direction.S, s.toString());
+        e.command("M");
+        assertEquals("4 4 " + Direction.E, e.toString());
+        w.command("M");
+        assertEquals("3 3 " + Direction.W, w.toString());
+    }
+
 }

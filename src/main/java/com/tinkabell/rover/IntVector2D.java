@@ -59,4 +59,29 @@ public class IntVector2D {
             }
         }
     }
+
+    /**
+     * Add a IntVector2D change to this
+     *
+     * @param change vector to move this
+     */
+    public void add(IntVector2D change) {
+        x += change.x;
+        y += change.y;
+    }
+
+    /**
+     * Is the IntVector2D inside the box
+     * from (x, y) of size (width, height) inclusive
+     *
+     * @param x coordinate of bottom left corner
+     * @param y coordinate of bottom left corner
+     * @param width of the box
+     * @param height of the box
+     *
+     * @return true iff inside or on edge of box
+     */
+    public boolean isValid(int x, int y, int width, int height) {
+        return this.x >= x && this.x <= x + width && this.y >= y && this.y <= y + height;
+    }
 }

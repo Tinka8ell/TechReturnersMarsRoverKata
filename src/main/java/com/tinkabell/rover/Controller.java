@@ -35,9 +35,16 @@ public class Controller {
         currentRover = mars.getRover(line);
     }
 
-    public void command(String commandString) {
+    public String command(String commandString) {
         if (currentRover == null)
             throw new NumberFormatException("Must select a Rover before sending commands");
-        currentRover.command(commandString);
+        String addition = "";
+        try{
+            currentRover.command(commandString);
+        }
+        catch (NumberFormatException e){
+            addition = " Bang! - " + e.getMessage();
+        }
+        return currentRover.toString() + addition;
     }
 }

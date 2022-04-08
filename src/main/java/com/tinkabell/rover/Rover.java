@@ -55,8 +55,13 @@ public class Rover {
         switch (code){
             case 'L' -> turnLeft();
             case 'R' -> turnRight();
+            case 'M' -> move();
             default -> throw new NumberFormatException("'" + code + "' is not a recognised action code");
         }
+    }
+
+    private void move() {
+        world.moveRover(this, facing);
     }
 
     private void turnLeft() {

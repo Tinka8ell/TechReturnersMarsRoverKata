@@ -104,13 +104,23 @@ public class Plateau {
     }
 
     public Location find(Rover rover) {
-        Location location = null;
         for (Location key : rovers.keySet()) {
             if (rovers.get(key).equals(rover)){
-                location = key;
-                break;
+                return key;
             }
         }
-        return location;
+        throw new NumberFormatException("Can't have two different Rovers at the same location");
+    }
+
+    public void moveRover(Rover rover, Delta delta) {
+        Location location = find(rover);
+        Location toLocation = new Location(location);
+        toLocation.add(delta);
+        if (!toLocation.isValid(0, 0, width, height))
+            throw new NumberFormatException("Can't leave the plateau");
+        if (rovers.get(toLocation) != null)
+            throw new NumberFormatException(("Bang! Something is blocking your way"));
+        rovers.remove(location, rover);
+        rovers.put(toLocation,rover);
     }
 }
