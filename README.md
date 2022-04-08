@@ -71,3 +71,8 @@ Finally, the Controller does not need to know what commands a Rover supports, so
 need to be passed through.  We will probably hide (make private) the individual movement commands in the Rover,
 but the UML does not yet reflect this as we will add tests for the internal function during development and remove
 their complexity once working.
+
+## Completion of Original Brief
+
+Once testing was complete and classes changed to suit, refined and documented, 
+the [UML was adjusted](doc/Mars4UML.jpg) to match.

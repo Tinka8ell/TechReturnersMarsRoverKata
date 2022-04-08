@@ -15,6 +15,12 @@ public class Delta extends IntVector2D {
         super(delta);
     }
 
+    /**
+     * Ensure Deltas are only the same as other Deltas
+     *
+     * @param o to compare
+     * @return true iff it is "equal"
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

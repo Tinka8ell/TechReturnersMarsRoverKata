@@ -27,17 +27,27 @@ public class Rover {
         facing = direction.getDelta();
     }
 
+    /**
+     * Get the direction we are pointing
+     *
+     * @return a Direction
+     */
     public Direction getDirection() {
         return toDirection.get(facing);
     }
 
+    /**
+     * The normal representation of a Rover as a String
+     *
+     * @return String containing location and direction
+     */
     @Override
     public String toString() {
         return world.find(this).toString() + " " + getDirection().toString();
     }
 
     /**
-     * Execute a list of commands
+     * Execute a String of commands
      *
      * @param commandString of command codes
      */
@@ -53,26 +63,14 @@ public class Rover {
      */
     private void action(int code) {
         switch (code){
-            case 'L' -> turnLeft();
-            case 'R' -> turnRight();
-            case 'M' -> move();
+            case 'L' -> // turn the Rover to the left
+                    facing.turn(-1);
+            case 'R' -> // turn the Rover to the right
+                    facing.turn(1);
+            case 'M' -> // move the Rover forward in the direction it is facing
+                    world.moveRover(this, facing);
             default -> throw new NumberFormatException("'" + code + "' is not a recognised action code");
         }
     }
 
-    private void move() {
-        world.moveRover(this, facing);
-    }
-
-    private void turnLeft() {
-        turn(-1);
-    }
-
-    private void turnRight() {
-        turn(1);
-    }
-
-    private void turn(int sign) {
-        facing.turn(sign);
-    }
 }

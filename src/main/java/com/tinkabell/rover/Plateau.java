@@ -15,9 +15,9 @@ import java.util.function.Predicate;
  */
 public class Plateau {
 
-    private int width;
-    private int height;
-    private Map<Location, Rover> rovers;
+    private final int width;
+    private final int height;
+    private final Map<Location, Rover> rovers;
 
     /**
      * Create the Plateau object from String input
@@ -36,22 +36,15 @@ public class Plateau {
             throw new NumberFormatException("Should only supply width and height");
         int width = Integer.parseInt(parts[0]);
         int height = Integer.parseInt(parts[1]);
-        setDimension(width, height);
-    }
 
-    /**
-     * Set up an empty world.
-     *
-     * @param width Integer of the Plateau
-     * @param height Integer of the Plateau
-     */
-    private void setDimension(int width, int height) {
         if (width <= 0) // does not make much sense to have one or less for width
             throw new NumberFormatException("Width must be a natural number");
         if (height <= 0) // does not make much sense to have one or less for height
             throw new NumberFormatException("Height must be a natural number");
         this.width = width;
         this.height = height;
+
+        // create empty Rover map
         rovers = new HashMap<>();
     }
 
@@ -79,6 +72,12 @@ public class Plateau {
         return response.toString();
     }
 
+    /**
+     * Return an existing, or new Rover at the location and direction given
+     *
+     * @param line containing the x, y coordinates and direction of the required Rover
+     * @return Rover that now exists in the rovers map
+     */
     public Rover getRover(String line) {
         if (line == null || line.isBlank())
             throw new NumberFormatException("Must supply x, y and direction");
@@ -93,6 +92,8 @@ public class Plateau {
         int y = Integer.parseInt(parts[1]);
         Direction direction = Direction.valueOf(parts[2]);
         Location key =  new Location(x, y);
+        if (!key.isValid(0, 0, width, height))
+            throw new NumberFormatException("Can't place a Rover outside of the Plateau");
         Rover rover = rovers.getOrDefault(key, null);
         if (rover == null){
             rover = new Rover(this, direction);
@@ -103,6 +104,12 @@ public class Plateau {
         return rover;
     }
 
+    /**
+     * Return the location of the given Rover
+     *
+     * @param rover to look for
+     * @return Location of where it was found
+     */
     public Location find(Rover rover) {
         for (Location key : rovers.keySet()) {
             if (rovers.get(key).equals(rover)){
@@ -112,6 +119,15 @@ public class Plateau {
         throw new NumberFormatException("Can't have two different Rovers at the same location");
     }
 
+    /**
+     * Move a given Rover by the given Delta
+     * This will detect, and not move if
+     *    reaches the edge of the plateau
+     *    collides with another object
+     *
+     * @param rover to move
+     * @param delta how far and what direction
+     */
     public void moveRover(Rover rover, Delta delta) {
         Location location = find(rover);
         Location toLocation = new Location(location);

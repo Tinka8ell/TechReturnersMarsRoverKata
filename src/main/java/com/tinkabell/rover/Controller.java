@@ -29,12 +29,25 @@ public class Controller {
         return "Controller{mars: " + (mars == null ? "null": mars.inspector()) + "}";
     }
 
-    public void getRover(String line){
+    /**
+     * Set the current Rover from a Rover string
+     *
+     * @param line containing location and direction of a Rover
+     */
+    public void setRover(String line){
         if (mars == null)
             throw new NullPointerException("Can't get Rover until we have a Plateau!");
         currentRover = mars.getRover(line);
     }
 
+    /**
+     * Give commands to the current Rover
+     * It will "safely" crash into the edges or other objects
+     * and stop just before with an extended message
+     *
+     * @param commandString of action codes
+     * @return String of final location of the Rover (toString)
+     */
     public String command(String commandString) {
         if (currentRover == null)
             throw new NumberFormatException("Must select a Rover before sending commands");
