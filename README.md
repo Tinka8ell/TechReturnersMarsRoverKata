@@ -21,7 +21,7 @@ From the brief we have:
   * Address of a rover in order x then y then d - no response
   * Command string - response is the final address of the rover as x then y then d 
 
-## Initial design
+### Initial design
 
 * Three main classes:
   * Controller receives commands and actions them and responds if required
@@ -39,7 +39,7 @@ Drawing the [Initial UML](doc/Mars1UML.jpg) enabled me to identify some more uti
 On top of this, we will have a main method class to act as the console device.
 To keep things clean we will put everything in its own package: com.tinkabell.rover
 
-## Testing Strategy
+### Testing Strategy
 
 Of course, we will be using TDD, but what do we need to support this?  As much of the class data is private,
 and we don't want to break encapsulation, I will add protected inspectors, so we can see (but not touch) 
@@ -52,7 +52,7 @@ Invalid Input Exceptions (whatever they will be, but probably runtime exceptions
 
 As the classes and supporting test classes evolve, they will be documented in the Git commit history. 
 
-## First Design Adjustment
+### First Design Adjustment
 
 As I worked through the testing of the basic framework, I realised that some things that were built and tested
 now needed to become private.  The create methods for Controller and Plateau should really be String only, 
@@ -61,7 +61,7 @@ to have an exposed getter for a Rover.  As above, I think the command method sho
 rather than the Rover object, and that object will be created and used withing the method.  This required changes 
 to the UML, so I now have a [2nd Edition UML](doc/Mars2UML.jpg) to show progress.
 
-## Second Design Adjustment
+### Second Design Adjustment
 
 As I formulated the testing of the Rover commands, I realised that there were methods missing in the Rover.
 It also transpired that, although a Rover is created using a Direction, this is an enum and so immutable, 
@@ -72,7 +72,44 @@ need to be passed through.  We will probably hide (make private) the individual 
 but the UML does not yet reflect this as we will add tests for the internal function during development and remove
 their complexity once working.
 
-## Completion of Original Brief
+### Completion of Original Brief
 
 Once testing was complete and classes changed to suit, refined and documented, 
 the [UML was adjusted](doc/Mars4UML.jpg) to match.
+
+## First extension:
+
+What to do next?  Information! So we need to add:
+
+* Help - ? (and H) - list commands that are ok
+* Plan / Plateau - P show a map of the plateau (can't use M)
+* Camera - C - what is in the next grid place?
+* View - V - extend camera to see the view - 90 degree view of up to 3 places 
+
+My vision is that it wound be something like:
+
+\   > /
+ \   /
+  \ /
+Viewing another Rover facing right of this one, 3 grid away and 1 to the right.
+Rover facing: left - <, right - >, away - A and towards - V
+The edge of the plateau are mountains - M, and you can't see past them!
+
+### First implementation
+
+Just add the '?' / 'H' commands in the controller.  So split up an action string, and output a message 
+appended to the messages from the Rovers / Plateau for the help command.
+
+Also add a toString() for the plateau, listing the Rovers.
+
+### Big design change
+
+As I built and tested the first extension, I realised that the original brief had not defined the response
+for errors.  Initially, I just used NumberFormatException as a generic runtime exception for invalid inputs.
+As I developed the project further, this was stretched beyond viability, but continued.  It is time for a redesign.
+The two methods that had no return value will now return an empty String if successful, and a String prefixed with
+"Error".  The rest of the String will contain the Exception message text used before.  Similarly, the command() 
+method will return the final Rover String followed by any error that may have occurred. 
+This should remove a lot of the overuse of NumberFormatException, but still leave us with "fail fast" philosophy.
+The [updated UML](doc/Mars5UML.jpg) reflects this change.
+

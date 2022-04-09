@@ -14,9 +14,17 @@ public class Controller {
      * Create the Plateau object from String input
      *
      * @param line String containing width and height separated with a space
+     * @return empty String if successful, or an "Error ..." message
      */
-    public void createPlateau(String line){
-        mars = new Plateau(line);
+    public String createPlateau(String line){
+        String response = ""; // no error
+        try {
+            mars = new Plateau(line);
+        }
+        catch (NumberFormatException e){
+            response = "Error: " + e.getMessage();
+        }
+        return response;
     }
 
     /**
@@ -26,18 +34,35 @@ public class Controller {
      * @return String representing the internals for testing
      */
     protected String inspector(){
-        return "Controller{mars: " + (mars == null ? "null": mars.inspector()) + "}";
+        return "Controller{mars: " +
+                (mars == null ? "null": mars.inspector()) +
+                "}";
     }
 
     /**
      * Set the current Rover from a Rover string
      *
      * @param line containing location and direction of a Rover
+     * @return empty String if successful, or an "Error ..." message
      */
-    public void setRover(String line){
-        if (mars == null)
-            throw new NullPointerException("Can't get Rover until we have a Plateau!");
-        currentRover = mars.getRover(line);
+    public String setRover(String line){
+        String response = "";
+        if (mars == null) {
+            response = "Error: Can't get Rover until we have a Plateau!";
+        } else {
+            try {
+                currentRover = mars.getRover(line);
+            }
+            catch (NumberFormatException e) {
+                line = line.trim().toUpperCase();
+                if (line.equals("?") || line.equals("H")){
+                    response = help();
+                } else {
+                    response =  "Error: " + e.getMessage();
+                }
+            }
+        }
+        return response;
     }
 
     /**
@@ -47,17 +72,53 @@ public class Controller {
      *
      * @param commandString of action codes
      * @return String of final location of the Rover (toString)
+     * appended with any error message
      */
     public String command(String commandString) {
-        if (currentRover == null)
-            throw new NumberFormatException("Must select a Rover before sending commands");
-        String addition = "";
-        try{
-            currentRover.command(commandString);
+        String response;
+        if (currentRover == null) {
+            commandString = commandString.trim().toUpperCase();
+            if (commandString.equals("?") || commandString.equals("H"))
+                response = help();
+            else if (commandString.equals("P"))
+                response = showPlateau();
+            else
+                response = "Error: Must select a Rover before sending commands";
+        } else {
+            response = currentRover.command(commandString);
+            response = currentRover.toString() + " " + response;
         }
-        catch (NumberFormatException e){
-            addition = " Bang! - " + e.getMessage();
+        return response;
+    }
+
+    /**
+     * Return a help string
+     *
+     * @return help message
+     */
+    private String help() {
+        String response = """
+                Rover Controller
+                Commands accepted:
+                   ? or H - this help test
+                   x y c - select new Rover with coordinates x, y and compass direction c
+                   P - show the Plateau
+                """;
+        if (currentRover != null){
+            response += "Current Rover (" +
+                    currentRover +
+                    ") accepts:\n" +
+                    currentRover.help();
         }
-        return currentRover.toString() + addition;
+        return response;
+    }
+
+    /**
+     * Output the current state of the Plateau
+     *
+     * @return String of Plateau info
+     */
+    public String showPlateau() {
+        return mars.toString();
     }
 }

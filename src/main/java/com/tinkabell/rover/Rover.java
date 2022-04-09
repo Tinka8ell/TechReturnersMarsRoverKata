@@ -51,10 +51,19 @@ public class Rover {
      *
      * @param commandString of command codes
      */
-    public void command(String commandString) {
-        commandString
-                .chars()
-                .forEach(this::action);
+    public String command(String commandString) {
+        String response = "";
+        if (commandString.contains("?") || commandString.contains("H"))
+            response = help();
+        else
+            try {
+                commandString
+                        .chars()
+                        .forEach(this::action);
+            }catch (NumberFormatException e){
+                response = "Error: " + e.getMessage();
+            }
+        return response;
     }
 
     /**
@@ -69,8 +78,19 @@ public class Rover {
                     facing.turn(1);
             case 'M' -> // move the Rover forward in the direction it is facing
                     world.moveRover(this, facing);
-            default -> throw new NumberFormatException("'" + code + "' is not a recognised action code");
+            default -> throw new NumberFormatException("Error: '" + (char) code + "' is not a recognised action code");
         }
     }
 
+    /**
+     * Return description of this Rover's commands
+     *
+     * @return commands and short description
+     */
+    public String help() {
+        return "Rover commands:\n" +
+                "   L - turn left 90 degrees" +
+                "   R - turn right 90 degrees" +
+                "   M - move forward one grid space";
+    }
 }

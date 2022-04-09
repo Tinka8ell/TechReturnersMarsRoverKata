@@ -48,6 +48,23 @@ public class Plateau {
         rovers = new HashMap<>();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder response = new StringBuilder("Plateau is " +
+                width + " wide and " +
+                height + " high with ");
+        if (rovers.size() > 0){
+            response.append(rovers.size()).append(" Rovers:");
+            for (Location key: rovers.keySet()) {
+                Rover rover = rovers.get(key);
+                response.append("\n").append(rover.toString());
+            }
+        }
+        else
+            response.append("no Rovers");
+        return response.toString();
+    }
+
     /**
      * The inspector.
      * A bit like the toString() method, but used for debugging and testing.
@@ -90,7 +107,13 @@ public class Plateau {
             throw new NumberFormatException("Should only supply x, y and direction");
         int x = Integer.parseInt(parts[0]);
         int y = Integer.parseInt(parts[1]);
-        Direction direction = Direction.valueOf(parts[2]);
+        Direction direction;
+        try{
+            direction = Direction.valueOf(parts[2]);
+        }
+        catch (IllegalArgumentException e){
+            throw new NumberFormatException("Third parameter should be a compass direction");
+        }
         Location key =  new Location(x, y);
         if (!key.isValid(0, 0, width, height))
             throw new NumberFormatException("Can't place a Rover outside of the Plateau");
