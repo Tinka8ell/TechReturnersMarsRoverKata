@@ -177,26 +177,26 @@ public class Plateau {
      */
     public String viewFromRover(Rover rover, Delta delta){
         Location location = find(rover);
-        return viewFromHere(location, Delta.ZERO, delta);
+        Location fromLocation = new Location(location);
+        fromLocation.add(delta);
+        return viewFromHere(fromLocation, delta);
     }
 
     /**
      * Internal code to do view from a location with an offset in direction delta
      *
      * @param location to base from
-     * @param offset to the Rover's location
      * @param delta to base direction from
      * @return a blank if nothing there or a rock ("M") or representation of a Rover
      */
-    private String viewFromHere(Location location, Delta offset, Delta delta){
+    private String viewFromHere(Location location, Delta delta){
         String response =  " ";
-        Location toLocation = new Location(location);
-        toLocation.add(offset);
-        toLocation.add(delta);
-        if (!toLocation.isValid(0, 0, width, height))
+        Location fromLocation = new Location(location);
+        fromLocation.add(delta);
+        if (!fromLocation.isValid(0, 0, width, height))
             response = "M"; // use a "mountain" to represent the edge of the plateau
-        else if (rovers.get(toLocation) != null) { //Something is blocking your way
-            Rover seen = rovers.get(toLocation);
+        else if (rovers.get(fromLocation) != null) { //Something is blocking your way
+            Rover seen = rovers.get(fromLocation);
             Direction direction = seen.getDirection();
             @SuppressWarnings("SpellCheckingInspection")
             int pos = "NESW".indexOf(direction.toString()); // convert Direction to number
@@ -227,32 +227,32 @@ public class Plateau {
      *   a representation of a Rover
      */
     public String roverView(Rover rover, Delta delta, int maxDepth){
-        Location location = find(rover);
         StringBuilder view = new StringBuilder();
+        Location location = find(rover);
+        Location fromLocation = new Location(location);
         Delta left = new Delta(delta);
         left.turn(-1);
+        left.add(delta);
         Delta right = new Delta(delta);
         right.turn(1);
         Delta back = new Delta(delta);
         back.turn(1);
         back.turn(1); // face back
-        Delta offset = new Delta(Delta.ZERO);
+        back.add(right);
         for (int i = 0; i < maxDepth; i++) {
-            offset.add(left);
-            offset.add(delta);
+            fromLocation.add(left);
         }
         for (int depth = maxDepth; depth >= 0; depth--) {
             view.append("\n"); // start new line
             view.append(" ".repeat(maxDepth - depth)); // indent by depth
             view.append("\\"); // add left view limit
-            Delta start = new Delta(offset);
+            Location scanLocation = new Location(fromLocation);
             for (int width = 0; width <= depth * 2 ; width++) {
-                view.append(viewFromHere(location, start, delta));
-                start.add(right);
+                view.append(viewFromHere(scanLocation, delta));
+                scanLocation.add(right);
             }
             view.append("/"); // add right view limit
-            offset.add(back);
-            offset.add(right);
+            fromLocation.add(back);
         }
         return view.toString();
     }

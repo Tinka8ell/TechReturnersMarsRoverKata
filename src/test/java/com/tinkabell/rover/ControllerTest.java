@@ -33,15 +33,15 @@ class ControllerTest {
             "100,100"
     })
     void checkCreatePlateauStringError(String input) {
-        assertThrows(NumberFormatException.class, () -> controller.createPlateau(input));
+        assertNotEquals("", controller.createPlateau(input));
     }
 
     @Test
     void checkCreatePlateauBadString() {
-        assertThrows(NumberFormatException.class, () -> controller.createPlateau(null), "with null");
-        assertThrows(NumberFormatException.class, () -> controller.createPlateau(""), "with empty");
-        assertThrows(NumberFormatException.class, () -> controller.createPlateau("    "), "with blank");
-        assertThrows(NumberFormatException.class, () -> controller.createPlateau("  1  "), "with too few arguments");
+        assertNotEquals("", controller.createPlateau(null), "with null");
+        assertNotEquals("", controller.createPlateau(""), "with empty");
+        assertNotEquals("", controller.createPlateau("    "), "with blank");
+        assertNotEquals("", controller.createPlateau("  1  "), "with too few arguments");
     }
 
     @Test
@@ -55,9 +55,9 @@ class ControllerTest {
     public void checkSendRoverOnlyCommands(){
         controller.createPlateau("11 9");
         controller.setRover("1 2 N");
-        assertEquals("1 2 W", controller.command("L"));
+        assertEquals("1 2 W", controller.command("L").trim());
         assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{1 2 W}}}", controller.inspector());
-        assertEquals("1 2 E", controller.command("RR"));
+        assertEquals("1 2 E", controller.command("RR").trim());
         assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{1 2 E}}}", controller.inspector());
     }
 
@@ -65,9 +65,9 @@ class ControllerTest {
     public void checkMoveCommands(){
         controller.createPlateau("11 9");
         controller.setRover("3 1 N");
-        assertEquals("3 2 N", controller.command("M"));
-        assertEquals("3 4 N", controller.command("MM"));
-        assertEquals("3 7 N", controller.command("MMM"));
+        assertEquals("3 2 N", controller.command("M").trim());
+        assertEquals("3 4 N", controller.command("MM").trim());
+        assertEquals("3 7 N", controller.command("MMM").trim());
         assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{3 7 N}}}", controller.inspector());
     }
 
@@ -75,8 +75,8 @@ class ControllerTest {
     public void checkWanderCommands(){
         controller.createPlateau("11 9");
         controller.setRover("3 3 N");
-        assertEquals("4 4 S", controller.command("MRMR"));
-        assertEquals("6 0 S", controller.command("MMLMMRMM"));
+        assertEquals("4 4 S", controller.command("MRMR").trim());
+        assertEquals("6 0 S", controller.command("MMLMMRMM").trim());
         assertEquals("Controller{mars: Plateau{width: 11, height: 9, rovers: {Rover{6 0 S}}}", controller.inspector());
     }
 
