@@ -80,6 +80,8 @@ public class Rover {
             }
             case 'C' -> // camera look at next grid space
                     throw new Exception(world.viewFromRover(this, facing));
+            case 'V' -> // view from rover to depth of 3 ...
+                    throw new Exception(world.roverView(this, facing, 3)); // depth of 3
             case 'H', '?' -> // help
                     throw new Exception(help());
             default -> throw new Exception("Error: '" + (char) code + "' is not a recognised action code");

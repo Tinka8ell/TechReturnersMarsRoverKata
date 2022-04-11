@@ -168,16 +168,37 @@ public class Plateau {
         return response;
     }
 
+    /**
+     * Give the view of the next location from the rover in the direction delta
+     *
+     * @param rover to base location from
+     * @param delta to base direction from
+     * @return a blank if nothing there or a rock ("M") or representation of a Rover
+     */
     public String viewFromRover(Rover rover, Delta delta){
-        String response =  " ";
         Location location = find(rover);
+        return viewFromHere(location, Delta.ZERO, delta);
+    }
+
+    /**
+     * Internal code to do view from a location with an offset in direction delta
+     *
+     * @param location to base from
+     * @param offset to the Rover's location
+     * @param delta to base direction from
+     * @return a blank if nothing there or a rock ("M") or representation of a Rover
+     */
+    private String viewFromHere(Location location, Delta offset, Delta delta){
+        String response =  " ";
         Location toLocation = new Location(location);
+        toLocation.add(offset);
         toLocation.add(delta);
         if (!toLocation.isValid(0, 0, width, height))
             response = "M"; // use a "mountain" to represent the edge of the plateau
         else if (rovers.get(toLocation) != null) { //Something is blocking your way
             Rover seen = rovers.get(toLocation);
             Direction direction = seen.getDirection();
+            @SuppressWarnings("SpellCheckingInspection")
             int pos = "NESW".indexOf(direction.toString()); // convert Direction to number
             int rotation = 0;
             if (Delta.S.equals(delta)) {
@@ -192,5 +213,47 @@ public class Plateau {
             response = "" + "A>V<".charAt(pos);
         }
         return response;
+    }
+
+    /**
+     * Give an isometric view of the locations from the rover in the direction delta
+     *
+     * @param rover to base location from
+     * @param delta to base direction from
+     * @param maxDepth of view (1 just neighbour) > 1 further away
+     * @return a 2D (multiline) view with for each visible location:
+     *   a blank if nothing there
+     *   a rock ("M")
+     *   a representation of a Rover
+     */
+    public String roverView(Rover rover, Delta delta, int maxDepth){
+        Location location = find(rover);
+        StringBuilder view = new StringBuilder();
+        Delta left = new Delta(delta);
+        left.turn(-1);
+        Delta right = new Delta(delta);
+        right.turn(1);
+        Delta back = new Delta(delta);
+        back.turn(1);
+        back.turn(1); // face back
+        Delta offset = new Delta(Delta.ZERO);
+        for (int i = 0; i < maxDepth; i++) {
+            offset.add(left);
+            offset.add(delta);
+        }
+        for (int depth = maxDepth; depth >= 0; depth--) {
+            view.append("\n"); // start new line
+            view.append(" ".repeat(maxDepth - depth)); // indent by depth
+            view.append("\\"); // add left view limit
+            Delta start = new Delta(offset);
+            for (int width = 0; width <= depth * 2 ; width++) {
+                view.append(viewFromHere(location, start, delta));
+                start.add(right);
+            }
+            view.append("/"); // add right view limit
+            offset.add(back);
+            offset.add(right);
+        }
+        return view.toString();
     }
 }
