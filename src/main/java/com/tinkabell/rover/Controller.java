@@ -1,5 +1,8 @@
 package com.tinkabell.rover;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * The controller class.
  *
@@ -75,7 +78,7 @@ public class Controller {
      * appended with any error message
      */
     public String command(String commandString) {
-        String response;
+        String response = "";
         if (currentRover == null) {
             commandString = commandString.trim().toUpperCase();
             if (commandString.equals("?") || commandString.equals("H"))
@@ -85,8 +88,24 @@ public class Controller {
             else
                 response = "Error: Must select a Rover before sending commands";
         } else {
-            response = currentRover.command(commandString);
-            response = currentRover.toString() + " " + response;
+            Pattern reserved = Pattern.compile("[Pp?Hh]");
+            Matcher matcher = reserved.matcher(commandString);
+            if (matcher.find()){
+                int pos = matcher.start();
+                if (pos > 0){
+                    response = currentRover.command(commandString.substring(0, pos));
+                }
+                if (response.isBlank()){
+                    String controllerCommand = commandString.substring(pos, pos + 1);
+                    switch (controllerCommand.toUpperCase()){
+                        case "?", "H" -> response = help();
+                        case "P" -> response = showPlateau();
+                    }
+                }
+            } else {
+                response = currentRover.command(commandString);
+                response = currentRover.toString() + " " + response;
+            }
         }
         return response;
     }

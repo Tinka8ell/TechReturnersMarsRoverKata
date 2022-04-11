@@ -41,21 +41,17 @@ public class MarsRover {
                 while (!line.isBlank()) {
                     line = reader.readLine();
                     if (line.isBlank())
-                        response = "";
-                    else
+                        response = "Thank you and goodbye";
+                    else {
                         response = controller.setRover(line.toUpperCase());
-                    if (response.isBlank())
-                        response = "\n"; // show new Rover accepted
-                    else // not Rover coordinates, so try command:
-                        response = controller.command(line.toUpperCase());
-                    if (! response.isBlank()){
-                        System.out.println(response);
-                        if (!response.contains("Error")) // if not error output Plateau for now
-                            System.out.println(controller.showPlateau());
+                        if (response.isBlank())
+                            response = "Ok"; // show new Rover accepted
+                        else // not Rover coordinates, so try command:
+                            response = controller.command(line.toUpperCase());
                     }
+                    System.out.println(response);
                 }
             }
         }
-        System.out.println("Thank you and goodbye");
     }
 }

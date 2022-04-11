@@ -112,4 +112,7 @@ The two methods that had no return value will now return an empty String if succ
 method will return the final Rover String followed by any error that may have occurred. 
 This should remove a lot of the overuse of NumberFormatException, but still leave us with "fail fast" philosophy.
 The [updated UML](doc/Mars5UML.jpg) reflects this change.
+A further adjustment to the Plateau (adding viewFromRover()) showed that I had missed the moveRover() method from the
+UML.  Again this method that used RuntimeExceptions rather than return value has been "corrected" and both methods
+added to the [further updated UML](doc/Mars6UML.jpg)
 

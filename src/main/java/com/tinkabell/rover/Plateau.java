@@ -150,16 +150,47 @@ public class Plateau {
      *
      * @param rover to move
      * @param delta how far and what direction
+     * @return empty String of ok, else a message
      */
-    public void moveRover(Rover rover, Delta delta) {
+    public String moveRover(Rover rover, Delta delta) {
+        String response =  " ";
         Location location = find(rover);
         Location toLocation = new Location(location);
         toLocation.add(delta);
         if (!toLocation.isValid(0, 0, width, height))
-            throw new NumberFormatException("Can't leave the plateau");
-        if (rovers.get(toLocation) != null)
-            throw new NumberFormatException(("Bang! Something is blocking your way"));
-        rovers.remove(location, rover);
-        rovers.put(toLocation,rover);
+            response = "Can't leave the plateau";
+        else if (rovers.get(toLocation) != null)
+            response = "Bang! Something is blocking your way";
+        else {
+            rovers.remove(location, rover);
+            rovers.put(toLocation,rover);
+        }
+        return response;
+    }
+
+    public String viewFromRover(Rover rover, Delta delta){
+        String response =  " ";
+        Location location = find(rover);
+        Location toLocation = new Location(location);
+        toLocation.add(delta);
+        if (!toLocation.isValid(0, 0, width, height))
+            response = "M"; // use a "mountain" to represent the edge of the plateau
+        else if (rovers.get(toLocation) != null) { //Something is blocking your way
+            Rover seen = rovers.get(toLocation);
+            Direction direction = seen.getDirection();
+            int pos = "NESW".indexOf(direction.toString()); // convert Direction to number
+            int rotation = 0;
+            if (Delta.S.equals(delta)) {
+                rotation = 2;
+            } else if (Delta.E.equals(delta)) {
+                rotation = 3;
+            } else if (Delta.W.equals(delta)) {
+                rotation = 1;
+            }
+            // else Delta.N.equals(delta): rotation = 0; it is 0 by default
+            pos = (pos + rotation) % 4;
+            response = "" + "A>V<".charAt(pos);
+        }
+        return response;
     }
 }

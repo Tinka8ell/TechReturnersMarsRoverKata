@@ -53,16 +53,13 @@ public class Rover {
      */
     public String command(String commandString) {
         String response = "";
-        if (commandString.contains("?") || commandString.contains("H"))
-            response = help();
-        else
-            try {
-                commandString
-                        .chars()
-                        .forEach(this::action);
-            }catch (NumberFormatException e){
-                response = "Error: " + e.getMessage();
+        try {
+            for (char code : commandString.toCharArray()) {
+                action(code);
             }
+        } catch (Exception e) {
+            response = e.getMessage();
+        }
         return response;
     }
 
@@ -70,15 +67,22 @@ public class Rover {
      * Execute the action code
      * @param code to action (character)
      */
-    private void action(int code) {
+    private void action(int code) throws Exception {
         switch (code){
             case 'L' -> // turn the Rover to the left
                     facing.turn(-1);
             case 'R' -> // turn the Rover to the right
                     facing.turn(1);
-            case 'M' -> // move the Rover forward in the direction it is facing
-                    world.moveRover(this, facing);
-            default -> throw new NumberFormatException("Error: '" + (char) code + "' is not a recognised action code");
+            case 'M' -> { // move the Rover forward in the direction it is facing
+                String response = world.moveRover(this, facing);
+                if (!response.isBlank())
+                    throw new Exception(response);
+            }
+            case 'C' -> // camera look at next grid space
+                    throw new Exception(world.viewFromRover(this, facing));
+            case 'H', '?' -> // help
+                    throw new Exception(help());
+            default -> throw new Exception("Error: '" + (char) code + "' is not a recognised action code");
         }
     }
 
@@ -91,6 +95,8 @@ public class Rover {
         return "Rover commands:\n" +
                 "   L - turn left 90 degrees" +
                 "   R - turn right 90 degrees" +
-                "   M - move forward one grid space";
+                "   M - move forward one grid space" +
+                "   C - camera view forward one grid space" +
+                "   H or ? - this message";
     }
 }
