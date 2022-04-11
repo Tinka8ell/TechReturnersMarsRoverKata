@@ -111,4 +111,43 @@ class ControllerTest {
         assertTrue(response.indexOf("Bang!") != 0);
     }
 
+    @Test
+    public void checkViewFromRover(){
+        controller.createPlateau("10 10");
+        controller.setRover("6 7 N");
+        controller.setRover("5 5 N");
+        String expected = """
+                5 5 N\040
+                \\       /
+                 \\     /
+                  \\  A/
+                   \\ /""";
+        assertEquals(expected, controller.command("V"));
+        controller.setRover("7 9 S");
+        expected = """
+                7 9 S\040
+                \\     V /
+                 \\     /
+                  \\  V/
+                   \\ /""";
+        assertEquals(expected, controller.command("V"));
+        controller.setRover("3 6 E");
+        expected = """
+                3 6 E\040
+                \\>      /
+                 \\ <   /
+                  \\  </
+                   \\ /""";
+        assertEquals(expected, controller.command("V"));
+        controller.setRover("0 1 W");
+        controller.setRover("3 0 W");
+        expected = """
+                3 0 W\040
+                \\MMMMMMM/
+                 \\MM A /
+                  \\M  /
+                   \\ /""";
+        assertEquals(expected, controller.command("V"));
+    }
+
 }
