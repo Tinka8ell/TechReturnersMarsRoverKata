@@ -15,9 +15,11 @@ import java.util.function.Predicate;
  */
 public class Plateau {
 
+    public static final int MAX_DEPTH = 3;
     private final int width;
     private final int height;
-    private final Map<Location, Rover> rovers;
+    private final Map<Location, Obstacle> obstacles;
+    private final Map<Location, Rover> deadRovers;
 
     /**
      * Create the Plateau object from String input
@@ -44,8 +46,32 @@ public class Plateau {
         this.width = width;
         this.height = height;
 
-        // create empty Rover map
-        rovers = new HashMap<>();
+        // create empty Obstacle map
+        obstacles = new HashMap<>();
+        deadRovers = new HashMap<>();
+
+        // scatter some rocks
+        scatterRocks();
+    }
+
+    /**
+     * Scatter rocks formations across the Plateau
+     * Divide the Plateau into chunks and put a single
+     * random rock formation (size and location) so that
+     * there will always be space to get around them.
+     */
+    private void scatterRocks() {
+    }
+
+    /**
+     * Place a Rover in a spare location on the Plateau facing in a random direction.
+     * Use similar chunking from the random rocks to ensure we don't get Rovers too
+     * close together.
+     *
+     * @return new Rover
+     */
+    public Rover addRandomRover(){
+        return null;
     }
 
     @Override
@@ -53,11 +79,11 @@ public class Plateau {
         StringBuilder response = new StringBuilder("Plateau is " +
                 width + " wide and " +
                 height + " high with ");
-        if (rovers.size() > 0){
-            response.append(rovers.size()).append(" Rovers:");
-            for (Location key: rovers.keySet()) {
-                Rover rover = rovers.get(key);
-                response.append("\n").append(rover.toString());
+        if (obstacles.size() > 0){
+            response.append(obstacles.size()).append(" Rovers:");
+            for (Location key: obstacles.keySet()) {
+                Obstacle obstacle = obstacles.get(key);
+                response.append("\n").append(obstacle.toString());
             }
         }
         else
@@ -73,15 +99,26 @@ public class Plateau {
      */
     public String inspector() {
         StringBuilder response = new StringBuilder("Plateau{width: " + width + ", height: " + height);
-        if (rovers != null && !rovers.isEmpty()) {
+        if (obstacles != null && !obstacles.isEmpty()) {
             response.append(", rovers: {");
-            for (Location key: rovers.keySet()) {
-                Direction direction = rovers.get(key).getDirection();
-                response.append("Rover{")
-                        .append(key.inspector())
-                        .append(" ")
-                        .append(direction.toString())
-                        .append("}, ");
+            for (Location key: obstacles.keySet()) {
+                Obstacle obstacle = obstacles.get(key);
+                if (obstacle instanceof Rover rover){
+                    Direction direction = rover.getDirection();
+                    response.append("Rover{")
+                            .append(key.inspector())
+                            .append(" ")
+                            .append(direction.toString())
+                            .append("}, ");
+                }
+                else {
+                    response.append(obstacle.getClass())
+                            .append("{")
+                            .append(key.inspector())
+                            .append(" ")
+                            .append(obstacle)
+                            .append("}, ");
+                }
             }
             response.delete(response.length() - 2, response.length()); // trim extra ", "
         }
@@ -117,13 +154,26 @@ public class Plateau {
         Location key =  new Location(x, y);
         if (!key.isValid(0, 0, width, height))
             throw new NumberFormatException("Can't place a Rover outside of the Plateau");
-        Rover rover = rovers.getOrDefault(key, null);
-        if (rover == null){
-            rover = new Rover(this, direction);
-            rovers.put(key, rover);
+        Rover rover = deadRovers.getOrDefault(key, null);
+        if (rover != null){
+            deadRovers.remove(key, rover);
+            throw new NumberFormatException("Unfortunately your rove has been destroyed!");
+        } else {
+            Obstacle obstacle = obstacles.getOrDefault(key, null);
+            if (obstacle != null){
+                if (obstacle instanceof Rover){
+                    rover = (Rover) obstacle;
+                    if (! rover.getDirection().equals(direction))
+                        throw new NumberFormatException("Can't have two different Rovers at the same location");
+                }
+                else{
+                    throw new NumberFormatException("Can't place Rover at the same location as something else");
+                }
+            } else {
+                rover = new Rover(this, direction);
+                obstacles.put(key, rover);
+            }
         }
-        if (! rover.getDirection().equals(direction))
-            throw new NumberFormatException("Can't have two different Rovers at the same location");
         return rover;
     }
 
@@ -134,8 +184,8 @@ public class Plateau {
      * @return Location of where it was found
      */
     public Location find(Rover rover) {
-        for (Location key : rovers.keySet()) {
-            if (rovers.get(key).equals(rover)){
+        for (Location key : obstacles.keySet()) {
+            if (obstacles.get(key).equals(rover)){
                 return key;
             }
         }
@@ -159,11 +209,11 @@ public class Plateau {
         toLocation.add(delta);
         if (!toLocation.isValid(0, 0, width, height))
             response = "Can't leave the plateau";
-        else if (rovers.get(toLocation) != null)
+        else if (obstacles.get(toLocation) != null)
             response = "Bang! Something is blocking your way";
         else {
-            rovers.remove(location, rover);
-            rovers.put(toLocation,rover);
+            obstacles.remove(location, rover);
+            obstacles.put(toLocation,rover);
         }
         return response;
     }
@@ -195,22 +245,26 @@ public class Plateau {
         fromLocation.add(delta);
         if (!fromLocation.isValid(0, 0, width, height))
             response = "M"; // use a "mountain" to represent the edge of the plateau
-        else if (rovers.get(fromLocation) != null) { //Something is blocking your way
-            Rover seen = rovers.get(fromLocation);
-            Direction direction = seen.getDirection();
-            @SuppressWarnings("SpellCheckingInspection")
-            int pos = "NESW".indexOf(direction.toString()); // convert Direction to number
-            int rotation = 0;
-            if (Delta.S.equals(delta)) {
-                rotation = 2;
-            } else if (Delta.E.equals(delta)) {
-                rotation = 3;
-            } else if (Delta.W.equals(delta)) {
-                rotation = 1;
+        else if (obstacles.get(fromLocation) != null) { //Something is blocking your way
+            Obstacle obstacle = obstacles.get(fromLocation);
+            if (obstacle instanceof Rover seen){
+                Direction direction = seen.getDirection();
+                @SuppressWarnings("SpellCheckingInspection")
+                int pos = "NESW".indexOf(direction.toString()); // convert Direction to number
+                int rotation = 0;
+                if (Delta.S.equals(delta)) {
+                    rotation = 2;
+                } else if (Delta.E.equals(delta)) {
+                    rotation = 3;
+                } else if (Delta.W.equals(delta)) {
+                    rotation = 1;
+                }
+                // else Delta.N.equals(delta): rotation = 0; it is 0 by default
+                pos = (pos + rotation) % 4;
+                response = "" + "A>V<".charAt(pos);
+            } else {
+                response = obstacle.representation();
             }
-            // else Delta.N.equals(delta): rotation = 0; it is 0 by default
-            pos = (pos + rotation) % 4;
-            response = "" + "A>V<".charAt(pos);
         }
         return response;
     }
@@ -255,5 +309,49 @@ public class Plateau {
             fromLocation.add(back);
         }
         return view.toString();
+    }
+
+    public String destroy(Rover rover, Delta delta) {
+        String response;
+        Location location = find(rover);
+        Location fromLocation = new Location(location);
+        fromLocation.add(delta);
+        if (!fromLocation.isValid(0, 0, width, height))
+            response = "Cannot fire off of the Plateau - you have wasted your laser!";
+        else if (obstacles.get(fromLocation) == null) // nothing there
+            response = "Nothing to fire at - you have wasted your laser!";
+        else {
+            Obstacle obstacle = obstacles.get(fromLocation);
+            obstacles.remove(fromLocation, obstacle);
+            response = "You have destroyed something!  there may be something you can mine";
+            if (obstacle instanceof Rover)
+                deadRovers.put(fromLocation, (Rover) obstacle);
+            obstacle = obstacle.destroy();
+            if (obstacle != null)
+                obstacles.put(fromLocation, obstacle);
+        }
+        return response;
+    }
+
+    public String dig(Rover rover, Delta delta) {
+        String response;
+        Location location = find(rover);
+        Location fromLocation = new Location(location);
+        fromLocation.add(delta);
+        if (!fromLocation.isValid(0, 0, width, height))
+            response = "Cannot dig off of the Plateau";
+        else if (obstacles.get(fromLocation) == null) // nothing there
+            response = "Nothing to dig into";
+        else {
+            Obstacle obstacle = obstacles.get(fromLocation);
+            if (obstacle.canBeMined()){
+                int gain = obstacle.getMinerals();
+                rover.receiveMinerals(gain);
+                obstacles.remove(fromLocation, obstacle);
+                response = "You have gained " + gain + " minerals and now have " + rover.getMinerals();
+            } else
+                response = "This cannot be mined";
+        }
+        return response;
     }
 }

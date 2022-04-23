@@ -116,3 +116,36 @@ A further adjustment to the Plateau (adding viewFromRover()) showed that I had m
 UML.  Again this method that used RuntimeExceptions rather than return value has been "corrected" and both methods
 added to the [further updated UML](doc/Mars6UML.jpg)
 
+## Second extension:
+
+This will be multipart extension.  The idea is to make a playable game.
+
+1. Add new commands:
+   * F - to "fire" the industrial laser (ray gun?) the destroys whatever is in the next grid place
+     * As this is heavy duty, it will take a number of turns (3 initially) to recharge, so use it sparingly
+     * Eventually it will "destroy" the target and leave a pile of rubble that can be mined with the digger
+   * D - to "dig" with the mining tool and extract from rubble (after using laser) and gain minerals
+   * A - to switch on the "auto camera" which will record what is in front of the rover until it stops.   
+2. Add single executable game
+   1. Accepts "named" rovers
+   2. Creates world for the rovers and drops them in
+   3. May create rocks (M - mountains) that can be destroyed to rubble (m - small mountains of rubble) that can be mined
+   4. Prompts for each surviving rover in turn to receive commands and return output (without location descriptors)
+   5. Ends when only one rover remains at tells you your score in minerals
+3. Add server / multiple processor version
+   1. Similar to the above but the world is hosted on a "server"
+   2. The controller only accepts commands for one rover and responds
+   3. The server controls sequencing, and, to ensure nothing blocks, will skip turns if no rover commands received
+4. To either of the above game versions add AI rovers to add to the battle?
+
+### Design change
+
+* The Plateau will need a map of Obstacles (interface) rather than Rovers, but will need a map of dead Rovers when  
+  they have been destroyed between turns
+* All Obstacles will be destroyable, but some will become mine-able
+* Rovers will gain minerals (from mining) and these will be added to the "rubble" if they are destroyed to be collected
+  by other Rovers.
+* Introduce Rocks (M) and Rubble (m) as concrete classes of Obstacle
+* Introduce the population of Plateaus with Rocks - may be varying sizes.
+
+![Updated UML design](doc/Mars7UML.jpg)
