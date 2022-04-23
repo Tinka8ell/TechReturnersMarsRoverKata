@@ -82,7 +82,7 @@ public class Rover implements Obstacle{
      * @param code to action (character)
      */
     private void action(int code) throws Exception {
-        switch (code){
+        switch (code) {
             case 'L' -> // turn the Rover to the left
                     facing.turn(-1);
             case 'R' -> // turn the Rover to the right
@@ -104,6 +104,11 @@ public class Rover implements Obstacle{
                     throw new Exception(world.viewFromRover(this, facing));
             case 'V' -> // view from rover to depth of 3 ...
                     throw new Exception(world.roverView(this, facing, Plateau.MAX_DEPTH)); // depth of 3
+            case 'Q' -> // quit
+                    {
+                        world.destroy(this);
+                        throw new Exception("OK - goodbye");
+                    }
             case 'H', '?' -> // help
                     throw new Exception(help());
             default -> throw new Exception("Error: '" + (char) code + "' is not a recognised action code");
@@ -123,6 +128,7 @@ public class Rover implements Obstacle{
                 "   F - fire mining laser" +
                 "   D - dig or mine rubble" +
                 "   C - camera view forward one grid space" +
+                "   Q - quit - self-destruct!" +
                 "   H or ? - this message";
     }
 
@@ -164,6 +170,14 @@ public class Rover implements Obstacle{
      */
     @Override
     public String representation() {
+        if(facing.equals(Delta.E))
+            return "E>";
+        if(facing.equals(Delta.W))
+            return "W<";
+        if(facing.equals(Delta.N))
+            return "NA";
+        if(facing.equals(Delta.S))
+            return "SV";
         return "R"; // will not be used as rovers have direction!
     }
 }

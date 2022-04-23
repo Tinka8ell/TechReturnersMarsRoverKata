@@ -96,15 +96,23 @@ public class Controller {
                     response = currentRover.command(commandString.substring(0, pos));
                 }
                 if (response.isBlank()){
+                    response = currentRover.toString() + "\n";
                     String controllerCommand = commandString.substring(pos, pos + 1);
                     switch (controllerCommand.toUpperCase()){
-                        case "?", "H" -> response = help();
-                        case "P" -> response = showPlateau();
+                        case "?", "H" -> response += help();
+                        case "P" -> response += showPlateau();
                     }
                 }
             } else {
                 response = currentRover.command(commandString);
-                response = currentRover.toString() + " " + response;
+                try{
+                    if (response.isBlank())
+                        response = currentRover.toString();
+                    else
+                        response = currentRover.toString() + "\n" + response;
+                } catch (NumberFormatException e){
+                    response = e.getMessage();
+                }
             }
         }
         return response;

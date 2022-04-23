@@ -44,4 +44,5 @@ public class Location extends IntVector2D{
     public void add(Delta delta) {
         super.add(delta);
     }
+
 }

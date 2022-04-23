@@ -3,6 +3,7 @@ package com.tinkabell.rover;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 
 /**
@@ -16,10 +17,12 @@ import java.util.function.Predicate;
 public class Plateau {
 
     public static final int MAX_DEPTH = 3;
+    public static final int MIN_SEPARATION = 1 + MAX_DEPTH * 2;
     private final int width;
     private final int height;
     private final Map<Location, Obstacle> obstacles;
     private final Map<Location, Rover> deadRovers;
+    private final Random random = new Random();
 
     /**
      * Create the Plateau object from String input
@@ -61,6 +64,18 @@ public class Plateau {
      * there will always be space to get around them.
      */
     private void scatterRocks() {
+        for (int x = 0; x < width; x += MIN_SEPARATION) {
+            for (int y = 0; y < height; y += MIN_SEPARATION) {
+                for (int count = 1 + random.nextInt(MIN_SEPARATION); count > 0; count--){
+                    int dx = x + random.nextInt(MIN_SEPARATION);
+                    int dy = y + random.nextInt(MIN_SEPARATION);
+                    Location key = new Location(dx, dy);
+                    if (key.isValid(0, 0, width, height)) {
+                        obstacles.put(key, new Rock());
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -79,15 +94,31 @@ public class Plateau {
         StringBuilder response = new StringBuilder("Plateau is " +
                 width + " wide and " +
                 height + " high with ");
+        int count = 0;
+        char[][] map = new char[height][width];
         if (obstacles.size() > 0){
-            response.append(obstacles.size()).append(" Rovers:");
             for (Location key: obstacles.keySet()) {
                 Obstacle obstacle = obstacles.get(key);
-                response.append("\n").append(obstacle.toString());
+                map[key.getY()][key.getX()] = obstacle.representation().charAt(0);
+                if (obstacle instanceof Rover) {
+                    if (count == 0)
+                        response.append(obstacles.size()).append(" Rovers:");
+                    response.append("\n").append(obstacle);
+                    count++;
+                }
             }
         }
-        else
+        if (count == 0)
             response.append("no Rovers");
+        for (int row = height - 1; row >= 0; row--) {
+            response.append("\n");
+            for (int col = 0; col < width; col++) {
+                char rep = map[row][col];
+                if (rep == 0)
+                    rep = ' ';
+                response.append(rep);
+            }
+        }
         return response.toString();
     }
 
@@ -189,7 +220,7 @@ public class Plateau {
                 return key;
             }
         }
-        throw new NumberFormatException("Can't have two different Rovers at the same location");
+        throw new NumberFormatException("Can't find your Rover - it may have been destroyed");
     }
 
     /**
@@ -321,15 +352,26 @@ public class Plateau {
         else if (obstacles.get(fromLocation) == null) // nothing there
             response = "Nothing to fire at - you have wasted your laser!";
         else {
-            Obstacle obstacle = obstacles.get(fromLocation);
-            obstacles.remove(fromLocation, obstacle);
-            response = "You have destroyed something!  there may be something you can mine";
-            if (obstacle instanceof Rover)
-                deadRovers.put(fromLocation, (Rover) obstacle);
-            obstacle = obstacle.destroy();
-            if (obstacle != null)
-                obstacles.put(fromLocation, obstacle);
+            response = destroy(fromLocation);
         }
+        return response;
+    }
+
+    public void destroy(Rover rover) {
+        Location fromLocation = find(rover);
+        destroy(fromLocation);
+    }
+
+    private String destroy(Location fromLocation) {
+        String response;
+        Obstacle obstacle = obstacles.get(fromLocation);
+        obstacles.remove(fromLocation, obstacle);
+        response = "You have destroyed something!  there may be something you can mine";
+        if (obstacle instanceof Rover)
+            deadRovers.put(fromLocation, (Rover) obstacle);
+        obstacle = obstacle.destroy();
+        if (obstacle != null)
+            obstacles.put(fromLocation, obstacle);
         return response;
     }
 

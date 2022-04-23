@@ -33,6 +33,14 @@ public class IntVector2D {
         this(vector.x, vector.y);
     }
 
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
     /**
      * Get a view to help with testing.
      *
