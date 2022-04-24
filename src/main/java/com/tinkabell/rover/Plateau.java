@@ -3,7 +3,6 @@ package com.tinkabell.rover;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.function.Predicate;
 
 /**
@@ -18,11 +17,10 @@ public class Plateau {
 
     public static final int MAX_DEPTH = 3;
     public static final int MIN_SEPARATION = 1 + MAX_DEPTH * 2;
-    private final int width;
-    private final int height;
+    private int width;
+    private int height;
     private final Map<Location, Obstacle> obstacles;
     private final Map<Location, Rover> deadRovers;
-    private final Random random = new Random();
 
     /**
      * Create the Plateau object from String input
@@ -42,51 +40,52 @@ public class Plateau {
         int width = Integer.parseInt(parts[0]);
         int height = Integer.parseInt(parts[1]);
 
+/* removing so we can create empty enhanced plateaus
         if (width <= 0) // does not make much sense to have one or less for width
             throw new NumberFormatException("Width must be a natural number");
         if (height <= 0) // does not make much sense to have one or less for height
             throw new NumberFormatException("Height must be a natural number");
+*/
         this.width = width;
         this.height = height;
 
         // create empty Obstacle map
         obstacles = new HashMap<>();
         deadRovers = new HashMap<>();
-
-        // scatter some rocks
-        scatterRocks();
     }
 
     /**
-     * Scatter rocks formations across the Plateau
-     * Divide the Plateau into chunks and put a single
-     * random rock formation (size and location) so that
-     * there will always be space to get around them.
-     */
-    private void scatterRocks() {
-        for (int x = 0; x < width; x += MIN_SEPARATION) {
-            for (int y = 0; y < height; y += MIN_SEPARATION) {
-                for (int count = 1 + random.nextInt(MIN_SEPARATION); count > 0; count--){
-                    int dx = x + random.nextInt(MIN_SEPARATION);
-                    int dy = y + random.nextInt(MIN_SEPARATION);
-                    Location key = new Location(dx, dy);
-                    if (key.isValid(0, 0, width, height)) {
-                        obstacles.put(key, new Rock());
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Place a Rover in a spare location on the Plateau facing in a random direction.
-     * Use similar chunking from the random rocks to ensure we don't get Rovers too
-     * close together.
+     * Extend the current Plateau to the new dimensions.
+     * Leave everything else where it is.
      *
-     * @return new Rover
+     * @param w new width
+     * @param h new height
      */
-    public Rover addRandomRover(){
-        return null;
+    public void extendTo(int w, int h) {
+        width = w;
+        height = h;
+    }
+
+    /**
+     * Attempt to add a Rock at the given location.
+     * If outside the Plateau, or it is already occupied then create nothing.
+     * @param location to attempt to add
+     */
+    public void addRock(Location location) {
+        addRock(location, 1);
+    }
+
+    /**
+     * Attempt to add a Rock at the given location.
+     * If outside the Plateau, or it is already occupied then create nothing.
+     * @param location to attempt to add
+     * @param size of Rock to add
+     */
+    public void addRock(Location location, int size) {
+        if (location.isValid(0, 0, width, height)) {
+            if (obstacles.get(location) == null)
+                obstacles.put(location, new Rock(size));
+        }
     }
 
     @Override
@@ -188,7 +187,7 @@ public class Plateau {
         Rover rover = deadRovers.getOrDefault(key, null);
         if (rover != null){
             deadRovers.remove(key, rover);
-            throw new NumberFormatException("Unfortunately your rove has been destroyed!");
+            throw new NumberFormatException("Unfortunately your rover has been destroyed!");
         } else {
             Obstacle obstacle = obstacles.getOrDefault(key, null);
             if (obstacle != null){
@@ -203,6 +202,29 @@ public class Plateau {
             } else {
                 rover = new Rover(this, direction);
                 obstacles.put(key, rover);
+            }
+        }
+        return rover;
+    }
+
+    /**
+     * Attempt to add a new Rover at the given location
+     * and facing the given direction.
+     *
+     * @param location for new Rover
+     * @param direction for new Rover
+     * @return Rover
+     */
+    public Rover addNewRover(Location location, Direction direction){
+        Rover rover = null;
+        if (location.isValid(0, 0, width, height)){ // on Plateau
+            Rover dead = deadRovers.getOrDefault(location, null);
+            if (dead == null) { // does not have dead Rover
+                Obstacle obstacle = obstacles.getOrDefault(location, null);
+                if (obstacle != null) { // nor any rocks, rubble or living rovers
+                    rover = new Rover(this, direction);
+                    obstacles.put(location, rover);
+                }
             }
         }
         return rover;

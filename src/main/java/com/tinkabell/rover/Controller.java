@@ -1,5 +1,6 @@
 package com.tinkabell.rover;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,10 @@ public class Controller {
             response = "Error: " + e.getMessage();
         }
         return response;
+    }
+
+    public void createEnhancedPlateau(){
+        mars = new EnhancedPlateau();
     }
 
     /**
@@ -147,5 +152,29 @@ public class Controller {
      */
     public String showPlateau() {
         return mars.toString();
+    }
+
+    public ArrayList<String> expandPlateau() {
+        ArrayList<String> list = new ArrayList<>();
+        if (mars instanceof EnhancedPlateau plateau){
+            list.addAll(plateau.expand());
+        }
+        return list;
+    }
+
+    public int getRandom(int size) {
+        int number = size / 2;
+        if (mars instanceof EnhancedPlateau plateau) {
+            number = plateau.getRandom(size);
+        }
+        return number;
+    }
+
+    public String getCurrentMaterials(){
+        int materials = currentRover.getMinerals();
+        if (materials < 2)
+            return materials + " material";
+        else
+            return materials + " materials";
     }
 }

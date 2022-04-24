@@ -1,6 +1,17 @@
 package com.tinkabell.rover;
 
 public class Rock implements Obstacle {
+
+    int minerals; // default Rock size
+
+    /**
+     * Create a Rock of the given size
+     * @param size as the number of minerals this contains
+     */
+    public Rock(int size) {
+        minerals = size;
+    }
+
     /**
      * Create a new Obstacle on the destruction of this Obstacle
      *
@@ -18,7 +29,7 @@ public class Rock implements Obstacle {
      */
     @Override
     public int getMinerals() {
-        return 1;
+        return minerals;
     }
 
     /**
@@ -28,7 +39,7 @@ public class Rock implements Obstacle {
      */
     @Override
     public boolean canBeMined() {
-        return true;
+        return false;
     }
 
     /**

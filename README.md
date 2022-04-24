@@ -149,3 +149,15 @@ This will be multipart extension.  The idea is to make a playable game.
 * Introduce the population of Plateaus with Rocks - may be varying sizes.
 
 ![Updated UML design](doc/Mars7UML.jpg)
+
+## Changes, changes, changes
+
+I am very aware that design changes rarely get back to the documentation!  Unless there is a way to easily reflect
+that actual design (e.g. Javadoc) the code moves on a pace and the external docs get left behind!
+I have no intention of redrawing the UML anymore.  After all, I was not planning to make many more changes in any case!
+Suffice to say that, with the attempts to "gamify" the Mars Rover, there has been a need to modify the  Plateau class
+and create a new super class (SuperPlateau ?) to encapsulate some game environment.  The TurnBaseGame class is also 
+being restructured, so it may be possible to include proper client - server comms.
+
+Well we got to a working turn based game on one machine!
+
